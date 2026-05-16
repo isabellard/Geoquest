@@ -1,12 +1,19 @@
 package co.edu.unbosque.geoquest.dto;
+
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class CategoriaDTO {
 
-	private int idCategoria;
+	private Long idCategoria;
 	private String nombre;
+
+	@JsonIgnore
 	private List<PlantillaDTO> plantillas;
+
+	@JsonIgnore
 	private List<PartidaDTO> partidas;
 
 	public CategoriaDTO() {
@@ -39,14 +46,14 @@ public class CategoriaDTO {
 	/**
 	 * @return the idCategoria
 	 */
-	public Integer getIdCategoria() {
+	public Long getIdCategoria() {
 		return idCategoria;
 	}
 
 	/**
 	 * @param idCategoria the idCategoria to set
 	 */
-	public void setIdCategoria(Integer idCategoria) {
+	public void setIdCategoria(Long idCategoria) {
 		this.idCategoria = idCategoria;
 	}
 
@@ -92,12 +99,6 @@ public class CategoriaDTO {
 		this.partidas = partidas;
 	}
 
-	/**
-	 * @param idCategoria the idCategoria to set
-	 */
-	public void setIdCategoria(int idCategoria) {
-		this.idCategoria = idCategoria;
-	}
 
 	@Override
 	public String toString() {

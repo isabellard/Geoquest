@@ -9,20 +9,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import co.edu.unbosque.geoquest.dto.UsuarioDTO;
+import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Usuario;
+import co.edu.unbosque.geoquest.repository.PartidaRepository;
 import co.edu.unbosque.geoquest.repository.UsuarioRepository;
 
+/**
+ * Servicio que proporciona operaciones CRUD y funcionalidades adicionales para
+ * usuarios. Implementa la interfaz CRUDOperation para operaciones básicas de
+ * creación, lectura, actualización y eliminación.
+ */
 @Service
 public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 
+	/** Repositorio para acceder a los datos de usuarios en la base de datos. */
 	@Autowired
 	private UsuarioRepository userRepo;
 
 	@Autowired
+	private PartidaRepository partidaRepo;
+
+	/** Mapeador para convertir entre entidades User y DTOs UserDTO. */
+	@Autowired
 	private ModelMapper modelMapper;
 
+	/** Constructor por defecto. */
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -30,16 +42,34 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 
 	}
 
+	/**
+	 * Cuenta el número total de usuarios en la base de datos.
+	 *
+	 * @return Número total de usuarios
+	 */
 	@Override
 	public long count() {
 		return userRepo.count();
 	}
 
+	/**
+	 * Verifica si existe un usuario con el ID especificado.
+	 *
+	 * @param id ID del usuario a verificar
+	 * @return true si el usuario existe, false en caso contrario
+	 */
 	@Override
 	public boolean exist(Long id) {
 		return userRepo.existsById(id) ? true : false;
 	}
 
+	/**
+	 * Crea un nuevo usuario en la base de datos. Codifica la contraseña antes de
+	 * guardarla.
+	 *
+	 * @param data DTO con los datos del usuario a crear
+	 * @return 0 si la creación fue exitosa, 1 si el nombre de usuario ya existe
+	 */
 	@Override
 	public int create(UsuarioDTO data) {
 		Usuario entity = modelMapper.map(data, Usuario.class);
@@ -53,6 +83,11 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Obtiene todos los usuarios de la base de datos.
+	 *
+	 * @return Lista de DTOs de usuarios
+	 */
 	@Override
 	public List<UsuarioDTO> getAll() {
 		List<Usuario> entityList = userRepo.findAll();
@@ -66,6 +101,12 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		return dtoList;
 	}
 
+	/**
+	 * Elimina un usuario por su ID.
+	 *
+	 * @param id ID del usuario a eliminar
+	 * @return 0 si la eliminación fue exitosa, 1 si el usuario no existe
+	 */
 	@Override
 	public int deleteById(Long id) {
 		Optional<Usuario> found = userRepo.findById(id);
@@ -77,8 +118,14 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Elimina un usuario por su nombre de usuario.
+	 *
+	 * @param username Nombre de usuario del usuario a eliminar
+	 * @return 0 si la eliminación fue exitosa, 1 si el usuario no existe
+	 */
 	public int deleteByUsername(String username) {
-		Optional<Usuario> found = userRepo.findByUsuario(username);
+		Optional<Usuario> found = userRepo.findBynombreUsuario(username);
 		if (found.isPresent()) {
 			userRepo.delete(found.get());
 			return 0;
@@ -87,14 +134,24 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Actualiza un usuario existente por su ID. Codifica la contraseña antes de
+	 * guardarla.
+	 *
+	 * @param id      ID del usuario a actualizar
+	 * @param newData DTO con los nuevos datos del usuario
+	 * @return 0 si la actualización fue exitosa, 1 si el nuevo nombre de usuario ya
+	 *         está en uso, 2 si el usuario a actualizar no existe, 3 en otros casos
+	 *         de error
+	 */
 	@Override
 	public int updateById(Long id, UsuarioDTO newData) {
 		Optional<Usuario> found = userRepo.findById(id);
-		Optional<Usuario> newFound = userRepo.findByUsuario(newData.getUsername());
+		Optional<Usuario> newFound = userRepo.findBynombreUsuario(newData.getNombreUsuario());
 
 		if (found.isPresent() && !newFound.isPresent()) {
 			Usuario temp = found.get();
-			temp.setUsuario(newData.getUsername());
+			temp.setNombreUsuario(newData.getNombreUsuario());
 			// Hash the password before saving
 			temp.setPassword(passwordEncoder.encode(newData.getPassword()));
 			userRepo.save(temp);
@@ -110,6 +167,12 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Obtiene un usuario por su ID.
+	 *
+	 * @param id ID del usuario a obtener
+	 * @return DTO del usuario si existe, null en caso contrario
+	 */
 	public UsuarioDTO getById(Long id) {
 		Optional<Usuario> found = userRepo.findById(id);
 		if (found.isPresent()) {
@@ -119,8 +182,14 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Verifica si un nombre de usuario ya está en uso.
+	 *
+	 * @param newUser Usuario con el nombre de usuario a verificar
+	 * @return true si el nombre de usuario ya está en uso, false en caso contrario
+	 */
 	public boolean findUsernameAlreadyTaken(Usuario newUser) {
-		Optional<Usuario> found = userRepo.findByUsuario(newUser.getUsername());
+		Optional<Usuario> found = userRepo.findBynombreUsuario(newUser.getUsername());
 		if (found.isPresent()) {
 			return true;
 		} else {
@@ -128,30 +197,88 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		}
 	}
 
+	/**
+	 * Verifica si un nombre de usuario ya está en uso.
+	 *
+	 * @param username Nombre de usuario a verificar
+	 * @return true si el nombre de usuario ya está en uso, false en caso contrario
+	 */
 	public boolean findUsernameAlreadyTaken(String username) {
-		Optional<Usuario> found = userRepo.findByUsuario(username);
+		Optional<Usuario> found = userRepo.findBynombreUsuario(username);
 		return found.isPresent();
 	}
 
+	/**
+	 * Valida las credenciales de un usuario.
+	 *
+	 * @param username Nombre de usuario
+	 * @param password Contraseña sin encriptar
+	 * @return 0 si las credenciales son válidas, 1 si son inválidas
+	 */
 	public int validateCredentials(String username, String password) {
-		// Find user by username
-		Optional<Usuario> userOpt = userRepo.findByUsuario(username);
+		// Find Usuario by username
+		Optional<Usuario> userOpt = userRepo.findBynombreUsuario(username);
 
-		// Check if user exists and password matches
+		// Check if Usuario exists and password matches
 		if (userOpt.isPresent()) {
-			Usuario user = userOpt.get();
-			if (passwordEncoder.matches(password, user.getPassword())) {
+			Usuario Usuario = userOpt.get();
+			if (passwordEncoder.matches(password, Usuario.getPassword())) {
 				return 0; // Success
 			}
 		}
 
 		return 1; // Invalid credentials
 	}
-	
-	  public UsuarioDTO obtenerPorNombre(String nombreUsuario) {
-	        Usuario usuario = userRepo.findByUsuario(nombreUsuario)
-	                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nombreUsuario));
-	        return modelMapper.map(usuario, UsuarioDTO.class);
-	    }
 
+	public UsuarioDTO obtenerPorNombre(String nombreUsuario) {
+		Usuario usuario = userRepo.findBynombreUsuario(nombreUsuario)
+				.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nombreUsuario));
+		return modelMapper.map(usuario, UsuarioDTO.class);
+	}
+
+	public boolean verificarUsuarioPorToken(int token) {
+		Optional<Usuario> userOpt = userRepo.findByToken(token);
+
+		if (userOpt.isPresent()) {
+			Usuario user = userOpt.get();
+			user.setVerificado(true);
+			user.setToken(0);
+			userRepo.save(user);
+			return true;
+		}
+		return false;
+	}
+
+	public int getRankingByUsername(String username) {
+		List<Usuario> ranking = userRepo.findTopByPuntos();
+		for (int i = 0; i < ranking.size(); i++) {
+			if (ranking.get(i).getNombreUsuario().equals(username)) {
+				return i + 1;
+			}
+		}
+		return -1;
+	}
+
+	public int preguntasCorrectas(String username) {
+		Usuario user = userRepo.findBynombreUsuario(username).get();
+		List<Partida> partidas = partidaRepo.findByUsuario(user);
+		int contador = 0;
+		for (Partida partida : partidas) {
+			contador += partida.getRespuestasCorrectas();
+		}
+		return contador;
+	}
+
+	public int partidaJugadas(String username) {
+		UsuarioDTO user = obtenerPorNombre(username);
+		return user.getPartidas().size();
+	}
+
+	public void setPuntos(int puntos, Long id) {
+		Optional<Usuario> found = userRepo.findById(id);
+		Usuario temp = found.get();
+		int puntosTotales = temp.getPuntosTotales() + puntos;
+		temp.setPuntosTotales(puntosTotales);
+		userRepo.save(temp);
+	}
 }

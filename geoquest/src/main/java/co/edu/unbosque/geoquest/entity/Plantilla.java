@@ -1,8 +1,12 @@
 package co.edu.unbosque.geoquest.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "plantilla")
@@ -25,26 +29,32 @@ public class Plantilla {
 	private TipoRespuesta tipoRespuesta;
 
 	@Column(name = "dificultad_base", nullable = false)
-	private Short dificultadBase;
+	private int dificultadBase;
 
-	@OneToMany(mappedBy = "plantilla", fetch = FetchType.LAZY)
-	private List<PartidaPregunta> partidaPreguntas;
+	@JsonIgnore
+	@OneToMany(mappedBy = "plantilla")
+	private List<Pregunta> preguntas;
 
 	public enum TipoRespuesta {
 		text, image
 	}
 
 	public Plantilla() {
-		// TODO Auto-generated constructor stub
 	}
 
-	public Plantilla(Categoria categoria, String enunciado, TipoRespuesta tipoRespuesta, Short dificultadBase) {
+	
+
+	public Plantilla(Categoria categoria, String enunciado, TipoRespuesta tipoRespuesta, int dificultadBase,
+			List<Pregunta> preguntas) {
 		super();
 		this.categoria = categoria;
 		this.enunciado = enunciado;
 		this.tipoRespuesta = tipoRespuesta;
 		this.dificultadBase = dificultadBase;
+		this.preguntas = preguntas;
 	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -65,21 +75,40 @@ public class Plantilla {
 				&& tipoRespuesta == other.tipoRespuesta;
 	}
 
+
 	/**
-	 * @return the partidaPreguntas
+	 * @return the dificultadBase
 	 */
-	public List<PartidaPregunta> getPartidaPreguntas() {
-		return partidaPreguntas;
+	public int getDificultadBase() {
+		return dificultadBase;
 	}
 
 	/**
-	 * @param partidaPreguntas the partidaPreguntas to set
+	 * @param dificultadBase the dificultadBase to set
 	 */
-	public void setPartidaPreguntas(List<PartidaPregunta> partidaPreguntas) {
-		this.partidaPreguntas = partidaPreguntas;
+	public void setDificultadBase(int dificultadBase) {
+		this.dificultadBase = dificultadBase;
 	}
 
-	
+
+
+	/**
+	 * @return the preguntas
+	 */
+	public List<Pregunta> getPreguntas() {
+		return preguntas;
+	}
+
+
+
+	/**
+	 * @param preguntas the preguntas to set
+	 */
+	public void setPreguntas(List<Pregunta> preguntas) {
+		this.preguntas = preguntas;
+	}
+
+
 
 	/**
 	 * @return the idPlantilla
@@ -136,21 +165,6 @@ public class Plantilla {
 	public void setTipoRespuesta(TipoRespuesta tipoRespuesta) {
 		this.tipoRespuesta = tipoRespuesta;
 	}
-
-	/**
-	 * @return the dificultadBase
-	 */
-	public Short getDificultadBase() {
-		return dificultadBase;
-	}
-
-	/**
-	 * @param dificultadBase the dificultadBase to set
-	 */
-	public void setDificultadBase(Short dificultadBase) {
-		this.dificultadBase = dificultadBase;
-	}
-
 
 	@Override
 	public String toString() {

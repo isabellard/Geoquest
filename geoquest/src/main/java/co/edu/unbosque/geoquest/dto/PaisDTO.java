@@ -1,8 +1,12 @@
 package co.edu.unbosque.geoquest.dto;
 
+import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 public class PaisDTO {
 
-	private int idPais;
+	private Long idPais;
 	private ContinenteDTO continente;
 	private String nombre;
 	private String capital;
@@ -12,15 +16,19 @@ public class PaisDTO {
 	private String banderaUrl;
 	private Long poblacion;
 	private Short popularidad;
+	@JsonIgnore
+	private List<PreguntaDTO> preguntas;
 
 	public PaisDTO() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public PaisDTO(ContinenteDTO continente, String nombre, String capital, String idioma, String moneda,
-			String codigoTelefonico, String banderaUrl, Long poblacion, Short popularidad) {
+
+	public PaisDTO(Long idPais, ContinenteDTO continenteDTO, String nombre, String capital, String idioma, String moneda,
+			String codigoTelefonico, String banderaUrl, Long poblacion, Short popularidad, List<PreguntaDTO> preguntas) {
 		super();
-		this.continente = continente;
+		this.idPais = idPais;
+		this.continente = continenteDTO;
 		this.nombre = nombre;
 		this.capital = capital;
 		this.idioma = idioma;
@@ -29,35 +37,66 @@ public class PaisDTO {
 		this.banderaUrl = banderaUrl;
 		this.poblacion = poblacion;
 		this.popularidad = popularidad;
+		this.preguntas = preguntas;
 	}
+
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(banderaUrl, capital, codigoTelefonico, continente, idPais, idioma, moneda, nombre,
+				poblacion, popularidad, preguntas);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PaisDTO other = (PaisDTO) obj;
+		return Objects.equals(banderaUrl, other.banderaUrl) && Objects.equals(capital, other.capital)
+				&& Objects.equals(codigoTelefonico, other.codigoTelefonico)
+				&& Objects.equals(continente, other.continente) && Objects.equals(idPais, other.idPais)
+				&& Objects.equals(idioma, other.idioma) && Objects.equals(moneda, other.moneda)
+				&& Objects.equals(nombre, other.nombre) && Objects.equals(poblacion, other.poblacion)
+				&& Objects.equals(popularidad, other.popularidad) && Objects.equals(preguntas, other.preguntas);
+	}
+
 
 	/**
 	 * @return the idPais
 	 */
-	public Integer getIdPais() {
+	public Long getIdPais() {
 		return idPais;
 	}
 
 	/**
 	 * @param idPais the idPais to set
 	 */
-	public void setIdPais(Integer idPais) {
+	public void setIdPais(Long idPais) {
 		this.idPais = idPais;
 	}
 
+	
+
 	/**
-	 * @return the continente
+	 * @return the continenteDTO
 	 */
 	public ContinenteDTO getContinente() {
 		return continente;
 	}
 
+
 	/**
-	 * @param continente the continente to set
+	 * @param continenteDTO the continenteDTO to set
 	 */
 	public void setContinente(ContinenteDTO continente) {
 		this.continente = continente;
 	}
+
 
 	/**
 	 * @return the nombre
@@ -171,11 +210,28 @@ public class PaisDTO {
 		this.popularidad = popularidad;
 	}
 
+	/**
+	 * @return the preguntas
+	 */
+	public List<PreguntaDTO> getPreguntas() {
+		return preguntas;
+	}
+
+	/**
+	 * @param preguntas the preguntas to set
+	 */
+	public void setPreguntas(List<PreguntaDTO> preguntas) {
+		this.preguntas = preguntas;
+	}
+
+
 	@Override
 	public String toString() {
-		return "Pais [continente=" + continente + ", nombre=" + nombre + ", capital=" + capital
-				+ ", idioma=" + idioma + ", moneda=" + moneda + ", codigoTelefonico=" + codigoTelefonico
-				+ ", banderaUrl=" + banderaUrl + ", poblacion=" + poblacion + ", popularidad=" + popularidad + "]";
+		return "Pais [idPais=" + idPais + ", continenteDTO=" + continente + ", nombre=" + nombre + ", capital="
+				+ capital + ", idioma=" + idioma + ", moneda=" + moneda + ", codigoTelefonico=" + codigoTelefonico
+				+ ", banderaUrl=" + banderaUrl + ", poblacion=" + poblacion + ", popularidad=" + popularidad
+				+ ", preguntas=" + preguntas + "]";
 	}
+
 
 }

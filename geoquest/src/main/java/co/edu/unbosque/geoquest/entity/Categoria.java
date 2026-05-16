@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "categoria")
 public class Categoria {
@@ -16,9 +18,11 @@ public class Categoria {
 	@Column(nullable = false, unique = true, length = 50)
 	private String nombre;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
 	private List<Plantilla> plantillas;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
 	private List<Partida> partidas;
 

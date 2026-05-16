@@ -1,5 +1,6 @@
 package co.edu.unbosque.geoquest.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,11 @@ public interface PaisRepository extends JpaRepository<Pais, Long> {
 	public List<Pais> findByContinente(Continente continente);
 
 	public List<Pais> findByContinenteAndIdPaisNot(Continente continente, Long idPais);
-	
+
 	public List<Pais> findByPopularidadEquals(Short popularidad);
 	
-	public Pais findTopByOrderByPoblacionDesc (); 
+	public List<Pais> findByPopularidad(Short popularidad);
 	
-	public Pais findTopByOrderByPoblacionAsc(); 
+	public List<Pais> findByPoblacion(Long poblacion);
+	
 }

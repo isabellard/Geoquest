@@ -9,8 +9,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.models.OpenAPI;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +41,7 @@ import co.edu.unbosque.geoquest.service.UsuarioService;
  */
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:8082")
+@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Autenticación", description = "API para autenticación de usuarios (login y registro)")
 @SecurityRequirement(name = "bearerAuth")
 public class AuthController {
@@ -105,8 +110,9 @@ public class AuthController {
 					    }
 					""")) @RequestBody UsuarioDTO loginRequest) {
 		try {
-			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-					loginRequest.getUsuario(), loginRequest.getPassword()));
+
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getNombreUsuario(), loginRequest.getPassword()));
 
 			UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 			String jwt = jwtUtil.generateToken(userDetails);
@@ -164,7 +170,7 @@ public class AuthController {
 					    }
 					""")) @RequestBody UsuarioDTO registerRequest) {
 		// Verificar si el nombre de usuario ya existe
-		if (userService.findUsernameAlreadyTaken(registerRequest.getUsuario())) {
+		if (userService.findUsernameAlreadyTaken(registerRequest.getNombreUsuario())) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("El nombre de usuario ya existe");
 		}
 		int result = userService.create(registerRequest);
@@ -185,6 +191,22 @@ public class AuthController {
 		}
 		UsuarioDTO usuario = userService.obtenerPorNombre(username);
 		return ResponseEntity.ok(usuario);
+	}
+	
+	@GetMapping("/debug/check")
+	public ResponseEntity<?> checkAuth(Authentication auth) {
+	    if (auth == null) {
+	        return ResponseEntity.ok("No autenticado");
+	    }
+	    
+	    Map<String, Object> info = new HashMap<>();
+	    info.put("name", auth.getName());
+	    info.put("authenticated", auth.isAuthenticated());
+	    info.put("authorities", auth.getAuthorities().stream()
+	        .map(a -> a.getAuthority())
+	        .collect(Collectors.toList()));
+	    
+	    return ResponseEntity.ok(info);
 	}
 
 	/**
@@ -211,7 +233,7 @@ public class AuthController {
 
 		/**
 		 * Constructor con token y rol.
-		 *
+		 * 
 		 * @param token Token JWT generado
 		 * @param role  Rol del usuario
 		 */
@@ -237,5 +259,7 @@ public class AuthController {
 		public String getRole() {
 			return role;
 		}
+		
+		
 	}
 }

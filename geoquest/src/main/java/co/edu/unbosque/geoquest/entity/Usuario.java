@@ -5,39 +5,50 @@ import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "usuario")
 public class Usuario implements UserDetails {
- 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
-    private Long idUsuario;
- 
-    @Column(nullable = false, length = 100)
-    private String nombre;
- 
-    @Column(nullable = false, unique = true, length = 150)
-    private String usuario;
-    
-    private String password;
-    
-    @Enumerated(EnumType.STRING)
+
+	/**
+	 * Número de versión para la serialización.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_usuario")
+	private Long idUsuario;
+
+	@Column(nullable = false, unique = true, length = 150)
+	private String nombreUsuario;
+
+	private String password;
+
+	@Enumerated(EnumType.STRING)
 	private Role role;
- 
-    @Column(name = "puntos_totales")
-    private int puntosTotales = 0;
- 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<Partida> partidas;
-    
-    private boolean accountNonExpired;
+
+	@Column(name = "puntos_totales")
+	private int puntosTotales = 0;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	private List<Partida> partidas;
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "usuario_logro", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_logro"))
+	private List<Logro> logros;
+
+	private boolean verificado;
+	private int token;
+
+	private boolean accountNonExpired;
 
 	/**
 	 * Indica si la cuenta del usuario no está bloqueada.
@@ -54,15 +65,10 @@ public class Usuario implements UserDetails {
 	 */
 	private boolean enabled;
 
-
-    /**
-	 * Constructor por defecto.
-	 * Inicializa un usuario con valores predeterminados:
-	 * - Cuenta no expirada
-	 * - Cuenta no bloqueada
-	 * - Credenciales no expiradas
-	 * - Cuenta habilitada
-	 * - Rol de usuario normal (USER)
+	/**
+	 * Constructor por defecto. Inicializa un usuario con valores predeterminados: -
+	 * Cuenta no expirada - Cuenta no bloqueada - Credenciales no expiradas - Cuenta
+	 * habilitada - Rol de usuario normal (USER)
 	 */
 	public Usuario() {
 		this.accountNonExpired = true;
@@ -71,55 +77,51 @@ public class Usuario implements UserDetails {
 		this.enabled = true;
 		this.role = Role.USER;
 	}
-    
-	public Usuario(String nombre, String usuario) {
-		super();
-		this.nombre = nombre;
-		this.usuario = usuario;
-	}
-	
-	public Usuario(String nombre, String usuario, Role role, int puntosTotales,
-			List<Partida> partidas) {
-		super();
-		this.nombre = nombre;
-		this.usuario = usuario;
-		this.role = role;
-		this.puntosTotales = puntosTotales;
-		this.partidas = partidas;
-	}
-	
+
 	/**
 	 * Constructor con nombre de usuario, contraseña y rol específico.
 	 * 
 	 * @param username Nombre de usuario
 	 * @param password Contraseña del usuario
-	 * @param rol Rol asignado al usuario
+	 * @param rol      Rol asignado al usuario
 	 */
-	public Usuario(String nombre, String usuario, String password, Role rol) {
-		this();
-		this.nombre = nombre; 
-		this.usuario = usuario;
+	public Usuario(String nombreUsuario, String password, Role role) {
+		super();
+		this.nombreUsuario = nombreUsuario;
 		this.password = password;
-		this.role=rol;
+		this.role = role;
+	}
+	
+
+	/**
+	 * Constructor con nombre de usuario, contraseña y rol específico.
+	 * 
+	 * @param username Nombre de usuario
+	 * @param password Contraseña del usuario
+	 */
+	public Usuario(String nombreUsuario, String password) {
+		super();
+		this.nombreUsuario = nombreUsuario;
+		this.password = password;
 	}
 
 
 	/**
 	 * Enumeración que define los roles disponibles en el sistema.
 	 * 
-	 * USER: Usuario regular con permisos básicos.
-	 * ADMIN: Administrador con permisos completos.
+	 * USER: Usuario regular con permisos básicos. ADMIN: Administrador con permisos
+	 * completos.
 	 */
 	public enum Role {
 		/** Usuario regular con permisos básicos */
-		USER, 
+		USER,
 		/** Administrador con permisos completos */
 		ADMIN
 	}
-	
+
 	/**
-	 * Obtiene las autoridades (roles) asignadas al usuario.
-	 * Implementación del método de la interfaz UserDetails.
+	 * Obtiene las autoridades (roles) asignadas al usuario. Implementación del
+	 * método de la interfaz UserDetails.
 	 * 
 	 * @return Colección de autoridades del usuario con el prefijo "ROLE_"
 	 */
@@ -127,10 +129,17 @@ public class Usuario implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
-	
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(idUsuario, nombre, puntosTotales, usuario);
+		return Objects.hash(idUsuario, puntosTotales, nombreUsuario);
 	}
 
 	@Override
@@ -142,24 +151,8 @@ public class Usuario implements UserDetails {
 		if (getClass() != obj.getClass())
 			return false;
 		Usuario other = (Usuario) obj;
-		return idUsuario == other.idUsuario && Objects.equals(nombre, other.nombre)
-				&& puntosTotales == other.puntosTotales && Objects.equals(usuario, other.usuario);
-	}
-
-	
-
-	/**
-	 * @return the role
-	 */
-	public Role getRole() {
-		return role;
-	}
-
-	/**
-	 * @param role the role to set
-	 */
-	public void setRole(Role role) {
-		this.role = role;
+		return idUsuario == other.idUsuario && puntosTotales == other.puntosTotales
+				&& Objects.equals(nombreUsuario, other.nombreUsuario);
 	}
 
 	/**
@@ -177,31 +170,45 @@ public class Usuario implements UserDetails {
 	}
 
 	/**
-	 * @return the nombre
+	 * @return the nombreUsuario
 	 */
-	public String getNombre() {
-		return nombre;
+	public String getNombreUsuario() {
+		return nombreUsuario;
 	}
 
 	/**
-	 * @param nombre the nombre to set
+	 * @param nombreUsuario the nombreUsuario to set
 	 */
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setNombreUsuario(String nombreUsuario) {
+		this.nombreUsuario = nombreUsuario;
 	}
 
 	/**
-	 * @return the usuario
+	 * @return the password
 	 */
-	public String getUsuario() {
-		return usuario;
+	public String getPassword() {
+		return password;
 	}
 
 	/**
-	 * @param usuario the usuario to set
+	 * @param password the password to set
 	 */
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	/**
+	 * @return the role
+	 */
+	public Role getRole() {
+		return role;
+	}
+
+	/**
+	 * @param role the role to set
+	 */
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 	/**
@@ -232,13 +239,47 @@ public class Usuario implements UserDetails {
 		this.partidas = partidas;
 	}
 
-	@Override
-	public String toString() {
-		return "Usuario [idUsuario=" + idUsuario + ", nombre=" + nombre + ", usuario=" + usuario + ", puntosTotales="
-				+ puntosTotales + "]";
+	/**
+	 * @return the logros
+	 */
+	public List<Logro> getLogros() {
+		return logros;
 	}
 
+	/**
+	 * @param logros the logros to set
+	 */
+	public void setLogros(List<Logro> logros) {
+		this.logros = logros;
+	}
 
+	/**
+	 * @return the verificado
+	 */
+	public boolean isVerificado() {
+		return verificado;
+	}
+
+	/**
+	 * @param verificado the verificado to set
+	 */
+	public void setVerificado(boolean verificado) {
+		this.verificado = verificado;
+	}
+
+	/**
+	 * @return the token
+	 */
+	public int getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token the token to set
+	 */
+	public void setToken(int token) {
+		this.token = token;
+	}
 
 	/**
 	 * @return the accountNonExpired
@@ -296,27 +337,25 @@ public class Usuario implements UserDetails {
 		this.enabled = enabled;
 	}
 
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	@Override
-	public @Nullable String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	@JsonIgnore
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "Usuario [idUsuario=" + idUsuario + ", nombreUsuario=" + nombreUsuario + ", password=" + password
+				+ ", role=" + role + ", puntosTotales=" + puntosTotales + ", partidas=" + partidas + ", logros="
+				+ logros + ", verificado=" + verificado + ", token=" + token + ", accountNonExpired="
+				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired="
+				+ credentialsNonExpired + ", enabled=" + enabled + "]";
+	}
 	
 	
-    
-    
-    
+	
+
+	
+
 }

@@ -1,17 +1,19 @@
 package co.edu.unbosque.geoquest.dto;
 
-import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class PlantillaDTO {
 
-	private int idPlantilla;
+	private Long idPlantilla;
 	private CategoriaDTO categoria;
 	private String enunciado;
 	private TipoRespuesta tipoRespuesta;
-	private Short dificultadBase;
-	private List<PartidaPreguntaDTO> partidaPreguntas;
+	private int dificultadBase;
+	@JsonIgnore
+	private List<PreguntaDTO> preguntas;
 
 	public enum TipoRespuesta {
 		text, image
@@ -48,38 +50,48 @@ public class PlantillaDTO {
 				&& tipoRespuesta == other.tipoRespuesta;
 	}
 
+
 	/**
-	 * @return the partidaPreguntas
+	 * @return the dificultadBase
 	 */
-	public List<PartidaPreguntaDTO> getPartidaPreguntas() {
-		return partidaPreguntas;
+	public int getDificultadBase() {
+		return dificultadBase;
 	}
 
 	/**
-	 * @param partidaPreguntas the partidaPreguntas to set
+	 * @param dificultadBase the dificultadBase to set
 	 */
-	public void setPartidaPreguntas(List<PartidaPreguntaDTO> partidaPreguntas) {
-		this.partidaPreguntas = partidaPreguntas;
+	public void setDificultadBase(int dificultadBase) {
+		this.dificultadBase = dificultadBase;
+	}
+
+
+
+	/**
+	 * @return the preguntas
+	 */
+	public List<PreguntaDTO> getPreguntas() {
+		return preguntas;
 	}
 
 	/**
-	 * @param idPlantilla the idPlantilla to set
+	 * @param preguntas the preguntas to set
 	 */
-	public void setIdPlantilla(int idPlantilla) {
-		this.idPlantilla = idPlantilla;
+	public void setPreguntas(List<PreguntaDTO> preguntas) {
+		this.preguntas = preguntas;
 	}
 
 	/**
 	 * @return the idPlantilla
 	 */
-	public Integer getIdPlantilla() {
+	public Long getIdPlantilla() {
 		return idPlantilla;
 	}
 
 	/**
 	 * @param idPlantilla the idPlantilla to set
 	 */
-	public void setIdPlantilla(Integer idPlantilla) {
+	public void setIdPlantilla(Long idPlantilla) {
 		this.idPlantilla = idPlantilla;
 	}
 
@@ -124,21 +136,6 @@ public class PlantillaDTO {
 	public void setTipoRespuesta(TipoRespuesta tipoRespuesta) {
 		this.tipoRespuesta = tipoRespuesta;
 	}
-
-	/**
-	 * @return the dificultadBase
-	 */
-	public Short getDificultadBase() {
-		return dificultadBase;
-	}
-
-	/**
-	 * @param dificultadBase the dificultadBase to set
-	 */
-	public void setDificultadBase(Short dificultadBase) {
-		this.dificultadBase = dificultadBase;
-	}
-
 
 	@Override
 	public String toString() {

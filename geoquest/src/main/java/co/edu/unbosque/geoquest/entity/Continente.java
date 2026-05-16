@@ -3,6 +3,8 @@ package co.edu.unbosque.geoquest.entity;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +26,7 @@ public class Continente {
 	@Column(nullable = false, unique = true, length = 50)
 	private String nombre;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "continente", fetch = FetchType.LAZY)
 	private List<Pais> paises;
 

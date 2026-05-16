@@ -3,10 +3,13 @@ package co.edu.unbosque.geoquest.dto;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ContinenteDTO {
 
 	private int idContinente;
 	private String nombre;
+	@JsonIgnore
 	private List<PaisDTO> paises;
 
 	public ContinenteDTO() {

@@ -4,13 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import co.edu.unbosque.geoquest.dto.PartidaDTO;
-import co.edu.unbosque.geoquest.dto.PreguntaDTO;
 import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Pregunta;
 import co.edu.unbosque.geoquest.entity.Usuario;
@@ -36,6 +33,8 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 	private CategoriaRepository categoriaRepo;
 	@Autowired
 	private UsuarioRepository usuarioRepo;
+	@Autowired
+	private LogroService logroSer; 
 	@Autowired
 	private PreguntaService preguntaSer;
 	@Autowired
@@ -129,6 +128,7 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 			usuarioSer.setPuntos(puntos, temp.getUsuario().getIdUsuario());
 			partidaRepo.save(temp);
 			respuestaRepo.borrarIncorrectasPorPartida(id);
+			logroSer.verificarLogros(temp.getUsuario());
 			return 1;
 		}
 		if (!found.isPresent()) {

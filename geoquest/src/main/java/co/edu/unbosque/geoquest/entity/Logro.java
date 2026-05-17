@@ -19,6 +19,7 @@ public class Logro {
 	private String descripcion;
 	private String objetivo;
 
+	@Column(nullable = false, length = 150)
 	@Enumerated(EnumType.STRING)
 	private TipoLogro tipo;
 
@@ -32,6 +33,9 @@ public class Logro {
 		PARTIDAS_JUGADAS, RESPUESTAS_CORRECTAS, PUNTOS_TOTALES, CATEGORIAS_DESCUBIERTAS, PRIMERA_VICTORIA, MASTER_CATEGORIA, RANKING 
 	}
 
+	public Logro() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public Logro(String descripcion, String objetivo, TipoLogro tipo, int puntosRecompensa, List<Usuario> usuarios) {
 		super();

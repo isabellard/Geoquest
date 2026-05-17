@@ -22,6 +22,9 @@ public class LogroDTO {
 		RACHA_DIARIA, PRIMERA_VICTORIA, MASTER_CATEGORIA
 	}
 
+	public LogroDTO() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public LogroDTO(String descripcion, String objetivo, TipoLogro tipo, int puntosRecompensa, List<UsuarioDTO> usuarios) {
 		super();

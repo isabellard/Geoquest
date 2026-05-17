@@ -24,6 +24,8 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
 	
 	public List<Partida> findByEstado(EstadoPartida estado);
 	
+	public long countByUsuarioAndEstado(Usuario usuario, EstadoPartida estado);
+	
 	
 	
 }

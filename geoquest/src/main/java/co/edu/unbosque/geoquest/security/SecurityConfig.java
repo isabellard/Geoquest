@@ -60,7 +60,7 @@ public class SecurityConfig {
 						.permitAll()
 						.requestMatchers("/partida/**").hasAnyRole("USER","ADMIN")
 						.requestMatchers("/usuario/ranking", "/usuario/cantlogros", "/usuario/partidasjugadas",
-								"/usuario/preguntascorrectas")
+								"/usuario/preguntascorrectas", "/usuario/logros")
 						.hasAnyRole("USER", "ADMIN")
 						.requestMatchers("/pais/**").hasRole("ADMIN")
 						.requestMatchers("/usuario/**").hasRole("ADMIN").anyRequest().authenticated())

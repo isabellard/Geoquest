@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.unbosque.geoquest.dto.LogroDTO;
 import co.edu.unbosque.geoquest.dto.UsuarioDTO;
+import co.edu.unbosque.geoquest.service.LogroService;
 import co.edu.unbosque.geoquest.service.UsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +35,10 @@ public class UsuarioController {
 
 	@Autowired
 	private UsuarioService userServ;
+	
+	@Autowired
+	
+	private LogroService logroSer; 
 
 	public UsuarioController() {
 	}
@@ -83,7 +89,7 @@ public class UsuarioController {
 	}
 
 	@GetMapping("/cantlogros")
-	ResponseEntity<Integer> getLogros(@RequestParam String username) {
+	ResponseEntity<Integer> getcantLogros(@RequestParam String username) {
 		int ranking = userServ.getLogrosByUsername(username);
 
 		if (ranking != -1) {
@@ -92,6 +98,12 @@ public class UsuarioController {
 			return new ResponseEntity<>(ranking,
 					HttpStatus.NOT_ACCEPTABLE);
 		}
+	}
+	
+	@GetMapping("/logros")
+	ResponseEntity<List<LogroDTO>> getLogros(@RequestParam String username) {
+	    List<LogroDTO> logros = logroSer.getLogrosConEstado(username);
+	    return new ResponseEntity<>(logros, HttpStatus.OK);
 	}
 	
 	@GetMapping("/preguntascorrectas")

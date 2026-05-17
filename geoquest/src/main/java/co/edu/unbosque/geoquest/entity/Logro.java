@@ -20,7 +20,7 @@ public class Logro {
 	private String objetivo;
 
 	@Enumerated(EnumType.STRING)
-	private TipoLogro tipo; // PARTIDAS, CORRECTAS, PUNTOS, RACHA
+	private TipoLogro tipo;
 
 	private int puntosRecompensa; 
 
@@ -29,8 +29,7 @@ public class Logro {
 	private List<Usuario> usuarios;
 
 	public enum TipoLogro {
-		PARTIDAS_JUGADAS, RESPUESTAS_CORRECTAS, RESPUESTAS_CORRECTAS_CONSECUTIVAS, PUNTOS_TOTALES, PAISES_DESCUBIERTOS,
-		RACHA_DIARIA, PRIMERA_VICTORIA, MASTER_CATEGORIA
+		PARTIDAS_JUGADAS, RESPUESTAS_CORRECTAS, PUNTOS_TOTALES, CATEGORIAS_DESCUBIERTAS, PRIMERA_VICTORIA, MASTER_CATEGORIA, RANKING 
 	}
 
 	

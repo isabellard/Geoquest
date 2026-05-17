@@ -1,5 +1,6 @@
 package co.edu.unbosque.geoquest.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +8,6 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import co.edu.unbosque.geoquest.dto.PartidaDTO;
 import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Pregunta;
@@ -76,7 +76,8 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 				preguntas.add(preguntaSer.generarPreguntaRandom(partida));
 			}
 		} else {
-			partida.setCategoria(categoriaRepo.getById(categoria));;
+			partida.setCategoria(categoriaRepo.getById(categoria));
+			;
 			for (int i = 0; i < 10; i++) {
 				preguntas.add(preguntaSer.generarPreguntaCategoria(categoria, partida));
 			}
@@ -108,6 +109,24 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 
 	}
 
+	public int actualizarPartidasAbandonadas() {
+		LocalDateTime haceUnDia = LocalDateTime.now().minusDays(1);
+
+		List<Partida> partidasAntiguas = partidaRepo.findByEstadoAndFechaBefore(EstadoPartida.EN_CURSO, haceUnDia);
+
+		if (partidasAntiguas.isEmpty()) {
+			return 0;
+		} else {
+			for (Partida partida : partidasAntiguas) {
+				partida.setEstado(EstadoPartida.ABANDONADA);
+			}
+			partidaRepo.saveAll(partidasAntiguas);
+			System.out.println("Partidas abandonadas actualizadas: " + partidasAntiguas.size());
+			return 1; 
+		}
+
+	}
+
 	@Override
 	public int create(PartidaDTO data) {
 		// TODO Auto-generated method stub
@@ -116,8 +135,14 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 
 	@Override
 	public List<PartidaDTO> getAll() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Partida> entityList = partidaRepo.findAll();
+		List<PartidaDTO> dtoList = new ArrayList<>();
+		entityList.forEach((entity) -> {
+
+			PartidaDTO dto = modelMapper.map(entity, PartidaDTO.class);
+			dtoList.add(dto);
+		});
+		return dtoList;
 	}
 
 	@Override

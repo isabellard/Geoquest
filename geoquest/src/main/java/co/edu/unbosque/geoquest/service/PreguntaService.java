@@ -6,8 +6,6 @@ import java.util.Random;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.cors.CorsConfigurationSource;
-import co.edu.unbosque.geoquest.controller.AuthController;
 import co.edu.unbosque.geoquest.dto.ContinenteDTO;
 import co.edu.unbosque.geoquest.dto.PaisDTO;
 import co.edu.unbosque.geoquest.dto.PlantillaDTO;
@@ -22,10 +20,6 @@ import co.edu.unbosque.geoquest.repository.PreguntaRepository;
 @Service
 public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 
-	private final CorsConfigurationSource corsConfigurationSource;
-
-	private final AuthController authController;
-
 	@Autowired
 	private PreguntaRepository preguntaRepo;
 	@Autowired
@@ -37,10 +31,8 @@ public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 
 	private Random random;
 
-	public PreguntaService(AuthController authController, CorsConfigurationSource corsConfigurationSource) {
+	public PreguntaService() {
 		random = new Random();
-		this.authController = authController;
-		this.corsConfigurationSource = corsConfigurationSource;
 	}
 
 	public Pregunta generarPreguntaDificultad(int dificultad, Partida partida) {
@@ -79,7 +71,7 @@ public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 	}
 	
 	public Pregunta generarPreguntaRandom(Partida partida) {
-		PaisDTO pais = paisService.findById(random.nextLong(paisService.count()-1));
+		PaisDTO pais = paisService.findById(random.nextLong(1,paisService.count()-1));
 		PlantillaDTO plantilla = plantillaSer.findById(random.nextLong(1, 17));
 		String datoExtra = obtenerDatoExtra(plantilla, pais);
 		String enunciado = construirEnunciado(plantilla.getEnunciado(), pais, datoExtra);
@@ -114,7 +106,7 @@ public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 	}
 	
 	public Pregunta generarPreguntaCategoria(Long categoria, Partida partida) {
-		PaisDTO pais = paisService.findById(random.nextLong(paisService.count()-1));
+		PaisDTO pais = paisService.seleccionaPaiseSegunDificultad(random.nextInt(1,2));
 		PlantillaDTO plantilla = plantillaSer.plantillaCategoria(categoria);
 		String datoExtra = obtenerDatoExtra(plantilla, pais);
 		String enunciado = construirEnunciado(plantilla.getEnunciado(), pais, datoExtra);
@@ -168,7 +160,7 @@ public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 		int categoria = (int) (long) plantilla.getCategoria().getIdCategoria();
 		PaisDTO pais = paisCorrecto;
 		while (pais.getIdPais() == paisCorrecto.getIdPais()) {
-			pais = paisService.findById((long) random.nextInt(0, (int) paisService.count() - 1));
+			pais = paisService.findById((long) random.nextInt(1, (int) paisService.count() - 1));
 		}
 
 		switch (categoria) {

@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -56,28 +55,26 @@ public class SecurityConfig {
 	 */
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
-				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-				.requestMatchers("/partida/**", "/pais/**", "/usuario/**").permitAll()
-				.anyRequest().authenticated())
-
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
+						.permitAll()
+						.requestMatchers("/partida/**").hasAnyRole("USER","ADMIN")
+						.requestMatchers("/usuario/ranking", "/usuario/cantlogros", "/usuario/partidasjugadas",
+								"/usuario/preguntascorrectas")
+						.hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/pais/**").hasRole("ADMIN")
+						.requestMatchers("/usuario/**").hasRole("ADMIN").anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
-	
-	/*
-	 * 
-				.requestMatchers("/usuario/getall", "/usuario/count", "/usuario/exists/**", "/usuario/getbyid/**")
-				.hasAnyRole("USER", "ADMIN").requestMatchers("/partida/**", "/pais/**").hasRole("ADMIN")
-				.requestMatchers("/usuario**").hasRole("ADMIN").anyRequest().authenticated())
-	 */
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:8082"));
+		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 		configuration.setAllowCredentials(true);

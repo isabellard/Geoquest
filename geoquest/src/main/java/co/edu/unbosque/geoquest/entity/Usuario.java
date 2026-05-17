@@ -90,6 +90,10 @@ public class Usuario implements UserDetails {
 		this.nombreUsuario = nombreUsuario;
 		this.password = password;
 		this.role = role;
+		this.accountNonExpired = true;
+		this.accountNonLocked = true;
+		this.credentialsNonExpired = true;
+		this.enabled = true;
 	}
 	
 
@@ -341,19 +345,18 @@ public class Usuario implements UserDetails {
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return null;
+		return nombreUsuario;
 	}
 
 	@Override
 	public String toString() {
-		return "Usuario [idUsuario=" + idUsuario + ", nombreUsuario=" + nombreUsuario + ", password=" + password
-				+ ", role=" + role + ", puntosTotales=" + puntosTotales + ", partidas=" + partidas + ", logros="
-				+ logros + ", verificado=" + verificado + ", token=" + token + ", accountNonExpired="
-				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired="
-				+ credentialsNonExpired + ", enabled=" + enabled + "]";
+		return "Usuario [nombreUsuario=" + nombreUsuario + ", password=" + password + ", role=" + role
+				+ ", puntosTotales=" + puntosTotales + ", verificado=" + verificado + ", token=" + token
+				+ ", accountNonExpired=" + accountNonExpired + ", accountNonLocked=" + accountNonLocked
+				+ ", credentialsNonExpired=" + credentialsNonExpired + ", enabled=" + enabled + "]";
 	}
-	
-	
+
+
 	
 
 	

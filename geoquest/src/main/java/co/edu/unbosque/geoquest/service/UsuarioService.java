@@ -10,8 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import co.edu.unbosque.geoquest.dto.UsuarioDTO;
+
 import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Usuario;
+import co.edu.unbosque.geoquest.entity.Usuario.Role;
 import co.edu.unbosque.geoquest.repository.PartidaRepository;
 import co.edu.unbosque.geoquest.repository.UsuarioRepository;
 
@@ -78,6 +80,10 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		} else {
 			// Hash the password before saving
 			entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+			if (entity.getRole() == null) {
+				entity.setRole(Role.USER);
+			}
+
 			userRepo.save(entity);
 			return 0;
 		}
@@ -257,6 +263,12 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 			}
 		}
 		return -1;
+	}
+
+	public int getLogrosByUsername(String username) {
+		Usuario user = userRepo.findBynombreUsuario(username).get();
+		return user.getLogros().size();
+
 	}
 
 	public int preguntasCorrectas(String username) {

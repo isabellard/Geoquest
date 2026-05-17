@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/usuario")
-@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:8081" })
+@CrossOrigin(origins = "http://localhost:4200")
 @Transactional
 @Tag(name = "User Management", description = "Endpoints for managing users")
 @SecurityRequirement(name = "bearerAuth")
@@ -73,6 +73,18 @@ public class UsuarioController {
 	@GetMapping("/ranking")
 	ResponseEntity<Integer> getRanking(@RequestParam String username) {
 		int ranking = userServ.getRankingByUsername(username);
+
+		if (ranking != -1) {
+			return new ResponseEntity<>(ranking, HttpStatus.ACCEPTED);
+		} else {
+			return new ResponseEntity<>(ranking,
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+
+	@GetMapping("/cantlogros")
+	ResponseEntity<Integer> getLogros(@RequestParam String username) {
+		int ranking = userServ.getLogrosByUsername(username);
 
 		if (ranking != -1) {
 			return new ResponseEntity<>(ranking, HttpStatus.ACCEPTED);

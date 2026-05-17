@@ -185,6 +185,11 @@ public class UsuarioDTO {
 		this.logros = logros;
 	}
 
+	@Override
+	public String toString() {
+		return "Usuario [nombreUsuario=" + nombreUsuario + ", password=" + password + ", role=" + role
+				+ ", puntosTotales=" + puntosTotales + "]";
+	}
 
 	
 	

@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/pais")
-@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:8081" })
+@CrossOrigin(origins = "http://localhost:4200")
 @Transactional
 @Tag(name = "Gestion de paises", description = "Endpoints para gestión de paises")
 @SecurityRequirement(name = "bearerAuth")

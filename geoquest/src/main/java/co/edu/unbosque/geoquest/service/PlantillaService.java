@@ -2,13 +2,12 @@ package co.edu.unbosque.geoquest.service;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import co.edu.unbosque.geoquest.dto.PlantillaDTO;
-import co.edu.unbosque.geoquest.entity.Categoria;
-import co.edu.unbosque.geoquest.repository.CategoriaRepository;
 import co.edu.unbosque.geoquest.repository.PlantillaRepository;
 
 @Service
@@ -18,28 +17,37 @@ public class PlantillaService implements CRUDOperation<PlantillaDTO> {
 	private PlantillaRepository plantillaRepo;
 
 	@Autowired
-	private CategoriaRepository categoriaRepo;
-
-	@Autowired
 	private ModelMapper modelMapper;
 
 	private Random random;
+
+	private List<PlantillaDTO> PlantillasTodas;
+	private List<PlantillaDTO> PlantillasCategoria;
+	private Long ultimaCategoria;
 
 	public PlantillaService() {
 		random = new Random();
 	}
 
+	public List<PlantillaDTO> getTodasPlantillas() {
+		if (PlantillasTodas == null) {
+			PlantillasTodas = plantillaRepo.findAll().stream().map(p -> modelMapper.map(p, PlantillaDTO.class))
+					.collect(Collectors.toList());
+		}
+		return PlantillasTodas;
+	}
+
 	public PlantillaDTO findById(Long id) {
-		return modelMapper.map(plantillaRepo.findById(id).get(), PlantillaDTO.class);
+		return getTodasPlantillas().stream().filter(p -> p.getIdPlantilla().equals(id)).findFirst().orElse(null);
 	}
 
 	public PlantillaDTO plantillaCategoria(Long categoria) {
-		PlantillaDTO plantilla = modelMapper.map(findById(random.nextLong(1, 17)), PlantillaDTO.class);
-		while (plantilla.getCategoria().getIdCategoria() != categoria) {
-			plantilla = modelMapper.map(findById(random.nextLong(1, 17)), PlantillaDTO.class);
+		if (PlantillasCategoria == null || !categoria.equals(ultimaCategoria)) {
+			ultimaCategoria = categoria;
+			PlantillasCategoria = getTodasPlantillas().stream()
+					.filter(p -> p.getCategoria().getIdCategoria().equals(categoria)).collect(Collectors.toList());
 		}
-		return plantilla; 
-
+		return PlantillasCategoria.get(random.nextInt(PlantillasCategoria.size()));
 	}
 
 	@Override

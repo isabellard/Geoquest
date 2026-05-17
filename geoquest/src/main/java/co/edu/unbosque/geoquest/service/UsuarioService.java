@@ -285,6 +285,10 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		UsuarioDTO user = obtenerPorNombre(username);
 		return user.getPartidas().size();
 	}
+	
+	public Long obtenerIdPorNombre(String nombre) {
+	    return userRepo.findBynombreUsuario(nombre).get().getIdUsuario();
+	}
 
 	public void setPuntos(int puntos, Long id) {
 		Optional<Usuario> found = userRepo.findById(id);

@@ -154,9 +154,7 @@ public class PreguntaDTO {
 
 	@Override
 	public String toString() {
-		return "Pregunta [idPregunta=" + idPregunta + ", enunciado=" + enunciado + ", dificultad=" + dificultad
-				+ ", partida=" + partida + ", plantilla=" + plantilla + ", pais=" + pais + ", respuesta=" + respuesta
-				+ "]";
+	    return "Pregunta [idPregunta=" + idPregunta + ", enunciado=" + enunciado + "]";
 	}
 	
 	

@@ -34,4 +34,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	
 	public Optional<Usuario> findByToken(int token);
 	
+	public Usuario getReferenceById(Long id);
 }

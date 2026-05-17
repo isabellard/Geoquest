@@ -3,11 +3,11 @@ package co.edu.unbosque.geoquest.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import co.edu.unbosque.geoquest.dto.PaisDTO;
 import co.edu.unbosque.geoquest.entity.Pais;
 import co.edu.unbosque.geoquest.repository.PaisRepository;
@@ -24,29 +24,17 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 
 	private Random random;
 
+	private List<Pais> paises;
+
 	public PaisService() {
 		random = new Random();
 	}
 
 	public PaisDTO seleccionaPaiseSegunDificultad(int dificultad) {
-		Short popularidadMaxima;
-		switch (dificultad) {
-		case 1:
-			popularidadMaxima = 5;
-			break;
-		case 2:
-			popularidadMaxima = 30;
-			break;
-		case 3:
-			popularidadMaxima = 75;
-			break;
-		default:
-			popularidadMaxima = 75;
-		}
-		List<Pais> entityList = paisRepo.findByPopularidad(popularidadMaxima);
-		PaisDTO paisElegido = modelMapper.map(entityList.get(random.nextInt(0, entityList.size() - 1)), PaisDTO.class);
-
-		return paisElegido;
+		short maxPop = (short) (dificultad == 1 ? 5 : dificultad == 2 ? 30 : 75);
+		List<Pais> filtrados = getPaisesEntidad().stream().filter(p -> p.getPopularidad() <= maxPop)
+				.collect(Collectors.toList());
+		return toPaisDTO(filtrados.get(random.nextInt(filtrados.size())));
 	}
 
 	@Transactional
@@ -66,8 +54,37 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 
 	@Override
 	public List<PaisDTO> getAll() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Pais> entityList = paisRepo.findAll();
+		List<PaisDTO> dtoList = new ArrayList<>();
+		entityList.forEach((entity) -> {
+
+			PaisDTO dto = modelMapper.map(entity, PaisDTO.class);
+			dtoList.add(dto);
+		});
+
+		return dtoList;
+	}
+
+	public List<Pais> getPaisesEntidad() {
+		if (paises == null || paises.isEmpty()) {
+			paises = paisRepo.findAll(); // sin ModelMapper
+		}
+		return paises;
+	}
+
+	public PaisDTO toPaisDTO(Pais pais) {
+		return modelMapper.map(pais, PaisDTO.class);
+	}
+
+	public PaisDTO getPaisRandom() {
+		List<Pais> paises = getPaisesEntidad();
+		return toPaisDTO(paises.get(random.nextInt(paises.size())));
+	}
+
+	public PaisDTO getPaisDistinto(Long idExcluir) {
+		List<Pais> paises = getPaisesEntidad().stream().filter(p -> !p.getIdPais().equals(idExcluir))
+				.collect(Collectors.toList());
+		return toPaisDTO(paises.get(random.nextInt(paises.size())));
 	}
 
 	@Override

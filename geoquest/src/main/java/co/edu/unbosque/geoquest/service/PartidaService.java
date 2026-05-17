@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import co.edu.unbosque.geoquest.dto.PartidaDTO;
+import co.edu.unbosque.geoquest.dto.PreguntaDTO;
 import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Pregunta;
 import co.edu.unbosque.geoquest.entity.Usuario;
@@ -16,6 +18,7 @@ import co.edu.unbosque.geoquest.entity.Partida.EstadoPartida;
 import co.edu.unbosque.geoquest.repository.CategoriaRepository;
 import co.edu.unbosque.geoquest.repository.PartidaRepository;
 import co.edu.unbosque.geoquest.repository.RespuestaRepository;
+import co.edu.unbosque.geoquest.repository.UsuarioRepository;
 
 /**
  * Servicio que proporciona operaciones CRUD y funcionalidades adicionales para
@@ -32,6 +35,8 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 	@Autowired
 	private CategoriaRepository categoriaRepo;
 	@Autowired
+	private UsuarioRepository usuarioRepo;
+	@Autowired
 	private PreguntaService preguntaSer;
 	@Autowired
 	private UsuarioService usuarioSer;
@@ -44,7 +49,7 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 
 	public PartidaDTO iniciarDificultad(int dificultad, String nombreUsuario) {
 		Partida partida = new Partida();
-		Usuario usuario = modelMapper.map(usuarioSer.obtenerPorNombre(nombreUsuario), Usuario.class);
+		Usuario usuario = usuarioRepo.getReferenceById(usuarioSer.obtenerIdPorNombre(nombreUsuario));
 		partida.setUsuario(usuario);
 		partida.setNivelDificultad(dificultad);
 		partida.setEstado(EstadoPartida.EN_CURSO);
@@ -65,26 +70,51 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 	}
 
 	public PartidaDTO iniciarCategoria(Long categoria, String nombreUsuario) {
+		long t0 = System.currentTimeMillis();
+
 		Partida partida = new Partida();
-		Usuario usuario = modelMapper.map(usuarioSer.obtenerPorNombre(nombreUsuario), Usuario.class);
+		Usuario usuario = usuarioRepo.getReferenceById(usuarioSer.obtenerIdPorNombre(nombreUsuario));
 		partida.setUsuario(usuario);
 		partida.setEstado(EstadoPartida.EN_CURSO);
+
+		long t1 = System.currentTimeMillis();
+		System.out.println(">> Usuario obtenido: " + (t1 - t0) + "ms");
+
 		partida = partidaRepo.save(partida);
+
+		long t2 = System.currentTimeMillis();
+		System.out.println(">> Partida guardada: " + (t2 - t1) + "ms");
+
 		List<Pregunta> preguntas = new ArrayList<>();
 		if (categoria == 8) {
 			for (int i = 0; i < 10; i++) {
+				long tp = System.currentTimeMillis();
 				preguntas.add(preguntaSer.generarPreguntaRandom(partida));
+				System.out.println(">> Pregunta " + (i + 1) + ": " + (System.currentTimeMillis() - tp) + "ms");
+
 			}
 		} else {
+
 			partida.setCategoria(categoriaRepo.getById(categoria));
 			;
+
 			for (int i = 0; i < 10; i++) {
+				long tp = System.currentTimeMillis();
 				preguntas.add(preguntaSer.generarPreguntaCategoria(categoria, partida));
+				System.out.println(">> Pregunta " + (i + 1) + ": " + (System.currentTimeMillis() - tp) + "ms");
+
 			}
 		}
+		long t3 = System.currentTimeMillis();
+		System.out.println(">> 10 preguntas generadas: " + (t3 - t2) + "ms");
 
 		partida.setPreguntas(preguntas);
+
 		partidaRepo.save(partida);
+		long t4 = System.currentTimeMillis();
+		System.out.println(">> Save final: " + (t4 - t3) + "ms");
+		long t5 = System.currentTimeMillis();
+	    System.out.println(">> TOTAL: " + (t5 - t0) + "ms");
 		return modelMapper.map(partida, PartidaDTO.class);
 
 	}
@@ -122,7 +152,7 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 			}
 			partidaRepo.saveAll(partidasAntiguas);
 			System.out.println("Partidas abandonadas actualizadas: " + partidasAntiguas.size());
-			return 1; 
+			return 1;
 		}
 
 	}

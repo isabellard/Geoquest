@@ -1,6 +1,5 @@
 package co.edu.unbosque.geoquest.entity;
 
-import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

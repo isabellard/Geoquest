@@ -236,13 +236,9 @@ public class Partida {
 		this.estado = estado;
 	}
 
-
 	@Override
 	public String toString() {
-		return "Partida [idPartida=" + idPartida + ", usuario=" + usuario + ", categoria=" + categoria + ", fecha="
-				+ fecha + ", puntosTotales=" + puntosTotales + ", nivelDificultad=" + nivelDificultad
-				+ ", respuestasCorrectas=" + respuestasCorrectas + ", estado=" + estado + ", preguntas=" + preguntas
-				+ "]";
+	    return "Partida [idPartida=" + idPartida + ", estado=" + estado + "]";
 	}
 
 

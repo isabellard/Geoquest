@@ -1,13 +1,14 @@
 package co.edu.unbosque.geoquest.dto;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+
+import co.edu.unbosque.geoquest.entity.Usuario;
 
 
-public class AudioriaDTO {
+public class AuditoriaDTO {
 
     private Long idAuditoria;
-    private String nombreUsuario;
+    private Usuario usuario;
     private TipoAccion tipoAccion;
 
     private String detalle;
@@ -18,41 +19,22 @@ public class AudioriaDTO {
         LOGIN, PARTIDA, LOGRO, REGISTRO
     }
 
-    public AudioriaDTO(String nombreUsuario, TipoAccion tipo, String detalle) {
-        this.nombreUsuario = nombreUsuario;
-        this.tipoAccion = tipo;
-        this.detalle = detalle;
-        this.fecha = LocalDateTime.now();
-    }
-
-    public AudioriaDTO() {}
-
-	public AudioriaDTO(String nombreUsuario, TipoAccion tipoAccion, String detalle, LocalDateTime fecha) {
+    public AuditoriaDTO() {
+		// TODO Auto-generated constructor stub
+	}
+    
+	public AuditoriaDTO(Usuario usuario, TipoAccion tipoAccion, String detalle) {
 		super();
-		this.nombreUsuario = nombreUsuario;
+		this.usuario = usuario;
 		this.tipoAccion = tipoAccion;
 		this.detalle = detalle;
 		this.fecha = fecha;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(detalle, fecha, idAuditoria, nombreUsuario, tipoAccion);
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AudioriaDTO other = (AudioriaDTO) obj;
-		return Objects.equals(detalle, other.detalle) && Objects.equals(fecha, other.fecha)
-				&& Objects.equals(idAuditoria, other.idAuditoria) && Objects.equals(nombreUsuario, other.nombreUsuario)
-				&& tipoAccion == other.tipoAccion;
-	}
+
+
+
 
 	/**
 	 * @return the idAuditoria
@@ -68,18 +50,19 @@ public class AudioriaDTO {
 		this.idAuditoria = idAuditoria;
 	}
 
+
 	/**
-	 * @return the nombreUsuario
+	 * @return the usuario
 	 */
-	public String getNombreUsuario() {
-		return nombreUsuario;
+	public Usuario getUsuario() {
+		return usuario;
 	}
 
 	/**
-	 * @param nombreUsuario the nombreUsuario to set
+	 * @param usuario the usuario to set
 	 */
-	public void setNombreUsuario(String nombreUsuario) {
-		this.nombreUsuario = nombreUsuario;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	/**
@@ -126,7 +109,7 @@ public class AudioriaDTO {
 
 	@Override
 	public String toString() {
-		return "Auditoria [idAuditoria=" + idAuditoria + ", nombreUsuario=" + nombreUsuario + ", tipoAccion="
+		return "Auditoria [idAuditoria=" + idAuditoria 
 				+ tipoAccion + ", detalle=" + detalle + ", fecha=" + fecha + "]";
 	}
 

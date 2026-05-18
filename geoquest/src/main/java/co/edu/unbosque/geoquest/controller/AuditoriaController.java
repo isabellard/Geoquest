@@ -28,12 +28,16 @@ public class AuditoriaController {
 	@Autowired
 	public AuditoriaService auditoriaService; 
 	
+	public AuditoriaController() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	@GetMapping("/getall")
 	ResponseEntity<List<Auditoria>> getAuditoria() {
 	    return new ResponseEntity<>(auditoriaService.getAll(), HttpStatus.OK);
 	}
 
-	@GetMapping("/auditoria/usuario")
+	@GetMapping("/usuario")
 	ResponseEntity<List<Auditoria>> getAuditoriaUsuario(@RequestParam String username) {
 	    return new ResponseEntity<>(auditoriaService.getByUsuario(username), HttpStatus.OK);
 	}

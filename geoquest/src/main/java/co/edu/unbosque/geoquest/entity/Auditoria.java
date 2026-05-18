@@ -1,14 +1,16 @@
 package co.edu.unbosque.geoquest.entity;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,7 +21,9 @@ public class Auditoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAuditoria;
 
-    private String nombreUsuario;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_usuario", nullable = true)
+    private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
     private TipoAccion tipoAccion;
@@ -32,41 +36,22 @@ public class Auditoria {
         LOGIN, PARTIDA, LOGRO, REGISTRO
     }
 
-    public Auditoria(String nombreUsuario, TipoAccion tipo, String detalle) {
-        this.nombreUsuario = nombreUsuario;
-        this.tipoAccion = tipo;
-        this.detalle = detalle;
-        this.fecha = LocalDateTime.now();
-    }
-
-    public Auditoria() {}
-
-	public Auditoria(String nombreUsuario, TipoAccion tipoAccion, String detalle, LocalDateTime fecha) {
+    public Auditoria() {
+		// TODO Auto-generated constructor stub
+	}
+    
+	public Auditoria(Usuario usuario, TipoAccion tipoAccion, String detalle) {
 		super();
-		this.nombreUsuario = nombreUsuario;
+		this.usuario = usuario;
 		this.tipoAccion = tipoAccion;
 		this.detalle = detalle;
 		this.fecha = fecha;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(detalle, fecha, idAuditoria, nombreUsuario, tipoAccion);
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Auditoria other = (Auditoria) obj;
-		return Objects.equals(detalle, other.detalle) && Objects.equals(fecha, other.fecha)
-				&& Objects.equals(idAuditoria, other.idAuditoria) && Objects.equals(nombreUsuario, other.nombreUsuario)
-				&& tipoAccion == other.tipoAccion;
-	}
+
+
+
 
 	/**
 	 * @return the idAuditoria
@@ -82,18 +67,19 @@ public class Auditoria {
 		this.idAuditoria = idAuditoria;
 	}
 
+
 	/**
-	 * @return the nombreUsuario
+	 * @return the usuario
 	 */
-	public String getNombreUsuario() {
-		return nombreUsuario;
+	public Usuario getUsuario() {
+		return usuario;
 	}
 
 	/**
-	 * @param nombreUsuario the nombreUsuario to set
+	 * @param usuario the usuario to set
 	 */
-	public void setNombreUsuario(String nombreUsuario) {
-		this.nombreUsuario = nombreUsuario;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	/**
@@ -140,7 +126,7 @@ public class Auditoria {
 
 	@Override
 	public String toString() {
-		return "Auditoria [idAuditoria=" + idAuditoria + ", nombreUsuario=" + nombreUsuario + ", tipoAccion="
+		return "Auditoria [idAuditoria=" + idAuditoria 
 				+ tipoAccion + ", detalle=" + detalle + ", fecha=" + fecha + "]";
 	}
 

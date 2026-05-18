@@ -30,6 +30,7 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 		random = new Random();
 	}
 
+	@Transactional  
 	public PaisDTO seleccionaPaiseSegunDificultad(int dificultad) {
 		short maxPop = (short) (dificultad == 1 ? 5 : dificultad == 2 ? 30 : 75);
 		List<Pais> filtrados = getPaisesEntidad().stream().filter(p -> p.getPopularidad() <= maxPop)
@@ -42,6 +43,7 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 		return paisRepo.findByPopularidad(dificultad);
 	}
 
+	@Transactional  
 	public PaisDTO findById(Long id) {
 		return modelMapper.map(paisRepo.findById(id).get(), PaisDTO.class);
 	}
@@ -52,6 +54,7 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 		return 0;
 	}
 
+	@Transactional  
 	@Override
 	public List<PaisDTO> getAll() {
 		List<Pais> entityList = paisRepo.findAll();
@@ -65,6 +68,7 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 		return dtoList;
 	}
 
+	@Transactional  
 	public List<Pais> getPaisesEntidad() {
 		if (paises == null || paises.isEmpty()) {
 			paises = paisRepo.findAll(); // sin ModelMapper
@@ -72,15 +76,18 @@ public class PaisService implements CRUDOperation<PaisDTO> {
 		return paises;
 	}
 
+	@Transactional  
 	public PaisDTO toPaisDTO(Pais pais) {
 		return modelMapper.map(pais, PaisDTO.class);
 	}
 
+	@Transactional  
 	public PaisDTO getPaisRandom() {
 		List<Pais> paises = getPaisesEntidad();
 		return toPaisDTO(paises.get(random.nextInt(paises.size())));
 	}
 
+	@Transactional  
 	public PaisDTO getPaisDistinto(Long idExcluir) {
 		List<Pais> paises = getPaisesEntidad().stream().filter(p -> !p.getIdPais().equals(idExcluir))
 				.collect(Collectors.toList());

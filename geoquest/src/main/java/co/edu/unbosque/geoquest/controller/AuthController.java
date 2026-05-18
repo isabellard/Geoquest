@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import co.edu.unbosque.geoquest.dto.UsuarioDTO;
 import co.edu.unbosque.geoquest.entity.Auditoria.TipoAccion;
 import co.edu.unbosque.geoquest.entity.Usuario;

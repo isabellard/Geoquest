@@ -3,10 +3,10 @@ package co.edu.unbosque.geoquest.dto;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import co.edu.unbosque.geoquest.entity.Auditoria;
 
 public class UsuarioDTO {
 
-	
 	private Long idUsuario;
 	private String nombreUsuario;
 	private String password;
@@ -17,8 +17,8 @@ public class UsuarioDTO {
 	private List<PartidaDTO> partidas;
 	@JsonIgnore
 	private List<LogroDTO> logros;
-
-
+	@JsonIgnore
+	private List<Auditoria> auditorias;
 
 	/**
 	 * Constructor por defecto. Inicializa un usuario con valores predeterminados: -
@@ -42,9 +42,8 @@ public class UsuarioDTO {
 		this.password = password;
 		this.role = role;
 		this.accountNonLocked = true;
-		
+
 	}
-	
 
 	/**
 	 * Constructor con nombre de usuario, contraseña y rol específico.
@@ -59,7 +58,6 @@ public class UsuarioDTO {
 		this.accountNonLocked = true;
 	}
 
-
 	/**
 	 * Enumeración que define los roles disponibles en el sistema.
 	 * 
@@ -72,7 +70,7 @@ public class UsuarioDTO {
 		/** Administrador con permisos completos */
 		ADMIN
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(idUsuario, puntosTotales, nombreUsuario);
@@ -174,7 +172,7 @@ public class UsuarioDTO {
 	public void setPartidas(List<PartidaDTO> partidas) {
 		this.partidas = partidas;
 	}
-	
+
 	/**
 	 * @return the logros
 	 */
@@ -208,10 +206,5 @@ public class UsuarioDTO {
 		return "Usuario [nombreUsuario=" + nombreUsuario + ", password=" + password + ", role=" + role
 				+ ", puntosTotales=" + puntosTotales + "]";
 	}
-
-	
-	
-
-	
 
 }

@@ -10,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 @Entity
 @Table(name = "usuario")
 public class Usuario implements UserDetails {
@@ -44,6 +43,10 @@ public class Usuario implements UserDetails {
 	@ManyToMany
 	@JoinTable(name = "usuario_logro", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_logro"))
 	private List<Logro> logros;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	private List<Auditoria> auditorias;
 
 	private boolean accountNonExpired;
 
@@ -92,7 +95,6 @@ public class Usuario implements UserDetails {
 		this.credentialsNonExpired = true;
 		this.enabled = true;
 	}
-	
 
 	/**
 	 * Constructor con nombre de usuario, contraseña y rol específico.
@@ -105,7 +107,6 @@ public class Usuario implements UserDetails {
 		this.nombreUsuario = nombreUsuario;
 		this.password = password;
 	}
-
 
 	/**
 	 * Enumeración que define los roles disponibles en el sistema.
@@ -317,17 +318,26 @@ public class Usuario implements UserDetails {
 		return nombreUsuario;
 	}
 
+	/**
+	 * @return the auditorias
+	 */
+	public List<Auditoria> getAuditorias() {
+		return auditorias;
+	}
+
+	/**
+	 * @param auditorias the auditorias to set
+	 */
+	public void setAuditorias(List<Auditoria> auditorias) {
+		this.auditorias = auditorias;
+	}
+
 	@Override
 	public String toString() {
 		return "Usuario [nombreUsuario=" + nombreUsuario + ", password=" + password + ", role=" + role
-				+ ", puntosTotales=" + puntosTotales
-				+ ", accountNonExpired=" + accountNonExpired + ", accountNonLocked=" + accountNonLocked
-				+ ", credentialsNonExpired=" + credentialsNonExpired + ", enabled=" + enabled + "]";
+				+ ", puntosTotales=" + puntosTotales + ", accountNonExpired=" + accountNonExpired
+				+ ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired=" + credentialsNonExpired
+				+ ", enabled=" + enabled + "]";
 	}
-
-
-	
-
-	
 
 }

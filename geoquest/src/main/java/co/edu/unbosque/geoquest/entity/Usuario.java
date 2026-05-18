@@ -45,7 +45,7 @@ public class Usuario implements UserDetails {
 	private List<Logro> logros;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Auditoria> auditorias;
 
 	private boolean accountNonExpired;

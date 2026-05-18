@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -56,13 +57,13 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/usuario/getall")
-						.permitAll()
-						.requestMatchers("/partida/**").hasAnyRole("USER","ADMIN")
+				// ✅ AGREGAR ESTO:
+				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+						.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/usuario/getall").permitAll()
+						.requestMatchers("/partida/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers("/usuario/ranking", "/usuario/cantlogros", "/usuario/partidasjugadas",
 								"/usuario/preguntascorrectas", "/usuario/logros")
-						.hasAnyRole("USER", "ADMIN")
-						.requestMatchers("/pais/**", "/auditoria/**").hasRole("ADMIN")
+						.hasAnyRole("USER", "ADMIN").requestMatchers("/pais/**", "/auditoria/**").hasRole("ADMIN")
 						.requestMatchers("/usuario/**").hasRole("ADMIN").anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
@@ -74,9 +75,10 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+		configuration.setAllowedOrigins(List.of("http://localhost:4200",
+				"https://stream-alumni-exorcist.ngrok-free.dev", "https://tu-app.netlify.app"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "ngrok-skip-browser-warning"));
 		configuration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -31,8 +31,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.unbosque.geoquest.dto.UsuarioDTO;
+import co.edu.unbosque.geoquest.entity.Auditoria.TipoAccion;
 import co.edu.unbosque.geoquest.entity.Usuario;
 import co.edu.unbosque.geoquest.security.JwtUtil;
+import co.edu.unbosque.geoquest.service.AuditoriaService;
 import co.edu.unbosque.geoquest.service.UsuarioService;
 
 /**
@@ -55,6 +57,8 @@ public class AuthController {
 	/** Servicio para operaciones relacionadas con usuarios. */
 	private final UsuarioService userService;
 
+	private final AuditoriaService auditoriaService;
+
 	/**
 	 * Constructor que inicializa las dependencias necesarias para el controlador.
 	 *
@@ -62,11 +66,6 @@ public class AuthController {
 	 * @param jwtUtil               Utilidad para tokens JWT
 	 * @param userService           Servicio de usuarios
 	 */
-	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UsuarioService userService) {
-		this.authenticationManager = authenticationManager;
-		this.jwtUtil = jwtUtil;
-		this.userService = userService;
-	}
 
 	/**
 	 * Maneja las solicitudes de inicio de sesión. Autentica al usuario y genera un
@@ -111,8 +110,8 @@ public class AuthController {
 					""")) @RequestBody UsuarioDTO loginRequest) {
 		try {
 
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginRequest.getNombreUsuario(), loginRequest.getPassword()));
+			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+					loginRequest.getNombreUsuario(), loginRequest.getPassword()));
 
 			UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 			String jwt = jwtUtil.generateToken(userDetails);
@@ -123,13 +122,22 @@ public class AuthController {
 				Usuario user = (Usuario) userDetails;
 				role = user.getRole().name();
 			}
-
+			auditoriaService.registrar(loginRequest.getNombreUsuario(), TipoAccion.LOGIN, "User logged in");
 			return ResponseEntity.ok(new AuthResponse(jwt, role));
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body("Nombre de usuario o contraseña inválidos o usuario no encontrado");
 		}
+	}
+
+	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UsuarioService userService,
+			AuditoriaService auditoriaService) {
+		super();
+		this.authenticationManager = authenticationManager;
+		this.jwtUtil = jwtUtil;
+		this.userService = userService;
+		this.auditoriaService = auditoriaService;
 	}
 
 	/**
@@ -175,6 +183,7 @@ public class AuthController {
 		}
 		int result = userService.create(registerRequest);
 		if (result == 0) {
+			auditoriaService.registrar(registerRequest.getNombreUsuario(), TipoAccion.REGISTRO, "New user registered");
 			return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado con éxito");
 		} else if (result == 3) {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Correo ya existente, inicie sesion");
@@ -192,21 +201,19 @@ public class AuthController {
 		UsuarioDTO usuario = userService.obtenerPorNombre(username);
 		return ResponseEntity.ok(usuario);
 	}
-	
+
 	@GetMapping("/debug/check")
 	public ResponseEntity<?> checkAuth(Authentication auth) {
-	    if (auth == null) {
-	        return ResponseEntity.ok("No autenticado");
-	    }
-	    
-	    Map<String, Object> info = new HashMap<>();
-	    info.put("name", auth.getName());
-	    info.put("authenticated", auth.isAuthenticated());
-	    info.put("authorities", auth.getAuthorities().stream()
-	        .map(a -> a.getAuthority())
-	        .collect(Collectors.toList()));
-	    
-	    return ResponseEntity.ok(info);
+		if (auth == null) {
+			return ResponseEntity.ok("No autenticado");
+		}
+
+		Map<String, Object> info = new HashMap<>();
+		info.put("name", auth.getName());
+		info.put("authenticated", auth.isAuthenticated());
+		info.put("authorities", auth.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+
+		return ResponseEntity.ok(info);
 	}
 
 	/**
@@ -259,7 +266,6 @@ public class AuthController {
 		public String getRole() {
 			return role;
 		}
-		
-		
+
 	}
 }

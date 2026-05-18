@@ -45,9 +45,6 @@ public class Usuario implements UserDetails {
 	@JoinTable(name = "usuario_logro", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_logro"))
 	private List<Logro> logros;
 
-	private boolean verificado;
-	private int token;
-
 	private boolean accountNonExpired;
 
 	/**
@@ -258,34 +255,6 @@ public class Usuario implements UserDetails {
 	}
 
 	/**
-	 * @return the verificado
-	 */
-	public boolean isVerificado() {
-		return verificado;
-	}
-
-	/**
-	 * @param verificado the verificado to set
-	 */
-	public void setVerificado(boolean verificado) {
-		this.verificado = verificado;
-	}
-
-	/**
-	 * @return the token
-	 */
-	public int getToken() {
-		return token;
-	}
-
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(int token) {
-		this.token = token;
-	}
-
-	/**
 	 * @return the accountNonExpired
 	 */
 	public boolean isAccountNonExpired() {
@@ -351,7 +320,7 @@ public class Usuario implements UserDetails {
 	@Override
 	public String toString() {
 		return "Usuario [nombreUsuario=" + nombreUsuario + ", password=" + password + ", role=" + role
-				+ ", puntosTotales=" + puntosTotales + ", verificado=" + verificado + ", token=" + token
+				+ ", puntosTotales=" + puntosTotales
 				+ ", accountNonExpired=" + accountNonExpired + ", accountNonLocked=" + accountNonLocked
 				+ ", credentialsNonExpired=" + credentialsNonExpired + ", enabled=" + enabled + "]";
 	}

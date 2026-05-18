@@ -31,8 +31,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	 * @param username El nombre de usuario del usuario a eliminar
 	 */
 	public void deleteBynombreUsuario(String nombreUsuario);
-	
-	public Optional<Usuario> findByToken(int token);
+
 	
 	public Usuario getReferenceById(Long id);
 }

@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import co.edu.unbosque.geoquest.dto.PartidaDTO;
-import co.edu.unbosque.geoquest.dto.UsuarioDTO;
+import co.edu.unbosque.geoquest.entity.Auditoria.TipoAccion;
+import co.edu.unbosque.geoquest.service.AuditoriaService;
 import co.edu.unbosque.geoquest.service.PartidaService;
+import co.edu.unbosque.geoquest.service.UsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -29,7 +31,11 @@ public class PartidaController {
 	@Autowired
 	public PartidaService partSer;
 
+	@Autowired
+	private final AuditoriaService auditoriaService;
+
 	public PartidaController() {
+		this.auditoriaService = new AuditoriaService();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -56,18 +62,17 @@ public class PartidaController {
 	@PutMapping(path = "/update")
 	ResponseEntity<String> updateNew(@RequestParam long id, @RequestParam int respuestaCorrecta,
 			@RequestParam int puntos) {
-		int status = partSer.updatePartida(id, respuestaCorrecta, puntos); 
+		String nombreusuario = partSer.updatePartida(id, respuestaCorrecta, puntos);
 
-		if (status == 1) {
+		if (nombreusuario != null) {
+			auditoriaService.registrar(nombreusuario, TipoAccion.PARTIDA,
+					"Finished match — " + respuestaCorrecta + "/10 correct — " + puntos + " pts");
 			return new ResponseEntity<>("Partida updated successfully", HttpStatus.ACCEPTED);
-		} else if (status == 2) {
-			return new ResponseEntity<>("Partida not found", HttpStatus.NOT_FOUND);
 		} else {
-			return new ResponseEntity<>("Error on update", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Partida not found", HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	
+
 	@GetMapping("/getall")
 	ResponseEntity<List<PartidaDTO>> getAll() {
 		List<PartidaDTO> partidas = partSer.getAll();

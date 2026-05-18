@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import co.edu.unbosque.geoquest.GeoquestApplication;
 import co.edu.unbosque.geoquest.dto.PartidaDTO;
 import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Pregunta;
@@ -25,6 +26,8 @@ import co.edu.unbosque.geoquest.repository.UsuarioRepository;
 @Service
 public class PartidaService implements CRUDOperation<PartidaDTO> {
 
+	private final GeoquestApplication geoquestApplication;
+
 	@Autowired
 	private PartidaRepository partidaRepo;
 	@Autowired
@@ -34,7 +37,7 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 	@Autowired
 	private UsuarioRepository usuarioRepo;
 	@Autowired
-	private LogroService logroSer; 
+	private LogroService logroSer;
 	@Autowired
 	private PreguntaService preguntaSer;
 	@Autowired
@@ -42,7 +45,8 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	public PartidaService() {
+	public PartidaService(GeoquestApplication geoquestApplication) {
+		this.geoquestApplication = geoquestApplication;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -113,12 +117,12 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 		long t4 = System.currentTimeMillis();
 		System.out.println(">> Save final: " + (t4 - t3) + "ms");
 		long t5 = System.currentTimeMillis();
-	    System.out.println(">> TOTAL: " + (t5 - t0) + "ms");
+		System.out.println(">> TOTAL: " + (t5 - t0) + "ms");
 		return modelMapper.map(partida, PartidaDTO.class);
 
 	}
 
-	public int updatePartida(Long id, int respuestasCorrectas, int puntos) {
+	public String updatePartida(Long id, int respuestasCorrectas, int puntos) {
 		Optional<Partida> found = partidaRepo.findById(id);
 		if (found.isPresent()) {
 			Partida temp = found.get();
@@ -129,12 +133,12 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 			partidaRepo.save(temp);
 			respuestaRepo.borrarIncorrectasPorPartida(id);
 			logroSer.verificarLogros(temp.getUsuario());
-			return 1;
+			return found.get().getUsuario().getNombreUsuario();
 		}
 		if (!found.isPresent()) {
-			return 2;
+			return null;
 		} else {
-			return 3;
+			return null;
 		}
 
 	}
@@ -157,6 +161,7 @@ public class PartidaService implements CRUDOperation<PartidaDTO> {
 
 	}
 
+	
 	@Override
 	public int create(PartidaDTO data) {
 		// TODO Auto-generated method stub

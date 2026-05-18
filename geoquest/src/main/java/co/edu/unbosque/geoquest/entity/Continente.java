@@ -27,7 +27,7 @@ public class Continente {
 	private String nombre;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "continente", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "continente", fetch = FetchType.EAGER)
 	private List<Pais> paises;
 
 	public Continente() {

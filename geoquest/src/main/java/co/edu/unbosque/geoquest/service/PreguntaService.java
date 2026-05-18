@@ -124,7 +124,7 @@ public class PreguntaService implements CRUDOperation<PreguntaDTO> {
 	}
 
 	public Pregunta generarPreguntaCategoria(Long categoria, Partida partida) {
-		PaisDTO pais = paisService.seleccionaPaiseSegunDificultad(random.nextInt(1, 2));
+		PaisDTO pais = paisService.seleccionaPaiseSegunDificultad(random.nextInt());
 		PlantillaDTO plantilla = plantillaSer.plantillaCategoria(categoria);
 		String datoExtra = obtenerDatoExtra(plantilla, pais);
 		String enunciado = construirEnunciado(plantilla.getEnunciado(), pais, datoExtra);

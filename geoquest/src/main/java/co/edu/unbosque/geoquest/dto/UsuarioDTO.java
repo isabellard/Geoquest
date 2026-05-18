@@ -12,6 +12,7 @@ public class UsuarioDTO {
 	private String password;
 	private Role role;
 	private int puntosTotales = 0;
+	private boolean accountNonLocked;
 	@JsonIgnore
 	private List<PartidaDTO> partidas;
 	@JsonIgnore
@@ -25,6 +26,7 @@ public class UsuarioDTO {
 	 * habilitada - Rol de usuario normal (USER)
 	 */
 	public UsuarioDTO() {
+		this.accountNonLocked = true;
 	}
 
 	/**
@@ -39,6 +41,7 @@ public class UsuarioDTO {
 		this.nombreUsuario = nombreUsuario;
 		this.password = password;
 		this.role = role;
+		this.accountNonLocked = true;
 		
 	}
 	
@@ -53,6 +56,7 @@ public class UsuarioDTO {
 		super();
 		this.nombreUsuario = nombreUsuario;
 		this.password = password;
+		this.accountNonLocked = true;
 	}
 
 
@@ -176,6 +180,20 @@ public class UsuarioDTO {
 	 */
 	public List<LogroDTO> getLogros() {
 		return logros;
+	}
+
+	/**
+	 * @return the accountNonLocked
+	 */
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	/**
+	 * @param accountNonLocked the accountNonLocked to set
+	 */
+	public void setAccountNonLocked(boolean accountNonLocked) {
+		this.accountNonLocked = accountNonLocked;
 	}
 
 	/**

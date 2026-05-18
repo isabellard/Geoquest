@@ -62,7 +62,7 @@ public class SecurityConfig {
 						.requestMatchers("/usuario/ranking", "/usuario/cantlogros", "/usuario/partidasjugadas",
 								"/usuario/preguntascorrectas", "/usuario/logros")
 						.hasAnyRole("USER", "ADMIN")
-						.requestMatchers("/pais/**").hasRole("ADMIN")
+						.requestMatchers("/pais/**", "/auditoria/**").hasRole("ADMIN")
 						.requestMatchers("/usuario/**").hasRole("ADMIN").anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())

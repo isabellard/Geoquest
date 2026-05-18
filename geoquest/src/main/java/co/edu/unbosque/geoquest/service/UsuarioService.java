@@ -242,19 +242,6 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		return modelMapper.map(usuario, UsuarioDTO.class);
 	}
 
-	public boolean verificarUsuarioPorToken(int token) {
-		Optional<Usuario> userOpt = userRepo.findByToken(token);
-
-		if (userOpt.isPresent()) {
-			Usuario user = userOpt.get();
-			user.setVerificado(true);
-			user.setToken(0);
-			userRepo.save(user);
-			return true;
-		}
-		return false;
-	}
-
 	public int getRankingByUsername(String username) {
 		List<Usuario> ranking = userRepo.findTopByPuntos();
 		for (int i = 0; i < ranking.size(); i++) {
@@ -285,9 +272,9 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		UsuarioDTO user = obtenerPorNombre(username);
 		return user.getPartidas().size();
 	}
-	
+
 	public Long obtenerIdPorNombre(String nombre) {
-	    return userRepo.findBynombreUsuario(nombre).get().getIdUsuario();
+		return userRepo.findBynombreUsuario(nombre).get().getIdUsuario();
 	}
 
 	public void setPuntos(int puntos, Long id) {
@@ -296,5 +283,16 @@ public class UsuarioService implements CRUDOperation<UsuarioDTO> {
 		int puntosTotales = temp.getPuntosTotales() + puntos;
 		temp.setPuntosTotales(puntosTotales);
 		userRepo.save(temp);
+	}
+
+	public int ban(String username) {
+		Optional<Usuario> found = userRepo.findBynombreUsuario(username);
+		if (found.isPresent()) {
+			Usuario u = found.get();
+			u.setAccountNonLocked(!u.isAccountNonLocked());
+			userRepo.save(u);
+			return 0;
+		}
+		return 1;
 	}
 }

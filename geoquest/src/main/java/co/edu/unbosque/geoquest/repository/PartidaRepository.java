@@ -8,6 +8,8 @@ import co.edu.unbosque.geoquest.entity.Partida;
 import co.edu.unbosque.geoquest.entity.Usuario;
 import co.edu.unbosque.geoquest.entity.Partida.EstadoPartida;
 import java.time.LocalDateTime;
+import co.edu.unbosque.geoquest.entity.Categoria;
+
 
 @Repository
 public interface PartidaRepository extends JpaRepository<Partida, Long> {
@@ -25,6 +27,9 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
 	public List<Partida> findByEstado(EstadoPartida estado);
 	
 	public long countByUsuarioAndEstado(Usuario usuario, EstadoPartida estado);
+	
+	public List<Partida> findByUsuarioAndEstado(Usuario usuario, EstadoPartida estado);
+	
 	
 	
 	

@@ -225,5 +225,12 @@ public class UsuarioController {
 			return new ResponseEntity<>("Error on delete", HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	@PutMapping("/ban")
+	ResponseEntity<String> banUser(@RequestParam String username) {
+	    int status = userServ.ban(username);
+	    if (status == 0) return new ResponseEntity<>("User banned/unbanned", HttpStatus.OK);
+	    return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+	}
 
 }
